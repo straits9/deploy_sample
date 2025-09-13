@@ -1,0 +1,7 @@
+platform :ios do
+  desc "Build and sign the iOS app"
+  lane :build_and_sign do
+    match(type: "development") # 개발용 서명
+    build_app(workspace: "Runner.xcworkspace", scheme: "Runner") # 앱빌드
+  end
+end

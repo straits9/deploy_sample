@@ -32,6 +32,27 @@ jobs:
       - name: Build Android AAB
         run: flutter build appbundle --release
 
+      # iOS 빌드를 위한 Ruby 및 Fastlane 설정
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+          working-directory: ios
+
+      # iOS 코드 서명 및 빌드
+      - name: Setup iOS Code Signing
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          MATCH_GIT_URL: https://github.com/straits9/cert_profile_keys.git
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+        run: |
+          cd ios
+          bundle exec fastlane match development # 개발용 프로파일 다운로드
+
       # 6. Build iOS app
       - name: Build iOS IPA
         run: flutter build ipa --release
