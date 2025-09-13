@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       # 1. repo checkout
@@ -34,7 +34,7 @@ jobs:
 
       # 6. Build iOS app
       - name: Build iOS IPA
-        run: flutter build ipa
+        run: flutter build ipa --release
 
       # 7. Android Apk를 아티팩트로 저장
       - name: Save Android AAB
