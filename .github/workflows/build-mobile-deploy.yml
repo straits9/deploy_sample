@@ -34,7 +34,7 @@ jobs:
 
       # 6. Build iOS app
       - name: Build iOS IPA
-        run: flutter build ipa --release
+        run: flutter build ipa
 
       # 7. Android Apk를 아티팩트로 저장
       - name: Save Android AAB
