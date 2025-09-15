@@ -57,7 +57,7 @@ jobs:
 
         run: |
           cd ios
-          bundle exec fastlane match development --readonly # 개발용 프로파일 다운로드
+          bundle exec fastlane match development --readonly --app_identifier com.fourchoi.deploySample # 개발용 프로파일 다운로드
 
       # 6. Build iOS app
       - name: Build iOS IPA
