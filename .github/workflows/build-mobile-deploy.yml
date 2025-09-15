@@ -86,8 +86,8 @@ jobs:
 
         run: |
           cd ios
-          # Apple Developer Portal 접근 테스트
-          echo "Testing Apple Developer Portal access..."
+          # Apple Developer Portal 접근 테스트 (API Key 사용)
+          echo "Testing Apple Developer Portal access with API Key..."
           bundle exec fastlane match appstore --readonly --app_identifier com.fourchoi.deploySample --verbose
 
       # 5. Build iOS app
