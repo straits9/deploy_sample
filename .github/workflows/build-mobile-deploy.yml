@@ -91,15 +91,15 @@ jobs:
           bundle exec fastlane match appstore --readonly --app_identifier com.fourchoi.deploySample --verbose
 
       # 5. Build iOS app
-      - name: Build iOS IPA
-        run: flutter build ipa --release
+      - name: Build iOS App
+        run: flutter build ios --release
 
       # 6. iOS App을 아티팩트로 저장
-      - name: Save iOS IPA
+      - name: Save iOS App
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: build/ios/ipa
+          name: ios-app
+          path: build/ios/archive
 
   deploy:
     runs-on: macos-latest
@@ -111,12 +111,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. iOS IPA 다운로드
-      - name: Download iOS IPA
+      # 2. Android AAB 다운로드
+      - name: Download Android AAB
         uses: actions/download-artifact@v4
         with:
-          name: ios-ipa
-          path: build/ios/ipa
+          name: android-app-bundle
+          path: build/app/outputs/bundle/release
+
+      # 3. iOS App 다운로드
+      - name: Download iOS App
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-app
+          path: build/ios/archive
 
       # 3. iOS 빌드를 위한 Ruby 및 Fastlane 설정
       - name: Setup Ruby
@@ -132,8 +139,36 @@ jobs:
           cd ios
           bundle install
 
-      # 5. Upload to TestFlight
-      - name: Upload to TestFlight
+      # 5. iOS Code Signing for Deploy
+      - name: Setup iOS Code Signing for Deploy
+        env:
+          FASTLANE_APPLE_ID: ${{ secrets.APPLE_ID }}
+          FASTLANE_TEAM_ID: ${{ secrets.TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          MATCH_GIT_URL: https://${{ secrets.CERT_REPO_TOKEN }}@github.com/straits9/cert_profile_keys.git
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          cd ios
+          bundle exec fastlane match appstore --readonly --app_identifier com.fourchoi.deploySample
+
+      # 6. Create iOS IPA
+      - name: Create iOS IPA
+        run: |
+          cd ios
+          xcrun xcodebuild -exportArchive -archivePath ../build/ios/archive/Runner.xcarchive -exportPath ../build/ios/ipa -exportOptionsPlist ExportOptions.plist
+
+      # 7. Deploy to Firebase App Distribution (Android)
+      - name: Deploy to Firebase App Distribution (Android)
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: build/app/outputs/bundle/release/app-release.aab
+          releaseNotes: "Automated build from GitHub Actions"
+
+      # 8. Upload to TestFlight (iOS)
+      - name: Upload to TestFlight (iOS)
         env:
           FASTLANE_APPLE_ID: ${{ secrets.APPLE_ID }}
           FASTLANE_TEAM_ID: ${{ secrets.TEAM_ID }}
