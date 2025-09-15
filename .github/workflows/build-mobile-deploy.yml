@@ -49,15 +49,15 @@ jobs:
       # iOS 코드 서명 및 빌드
       - name: Setup iOS Code Signing
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
+          FASTLANE_APPLE_ID: ${{ secrets.APPLE_ID }}
+          FASTLANE_TEAM_ID: ${{ secrets.TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           MATCH_GIT_URL: https://${{ secrets.CERT_REPO_TOKEN }}@github.com/straits9/cert_profile_keys.git
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
         run: |
           cd ios
-          bundle exec fastlane match development # 개발용 프로파일 다운로드
+          bundle exec fastlane match development --readonly # 개발용 프로파일 다운로드
 
       # 6. Build iOS app
       - name: Build iOS IPA
