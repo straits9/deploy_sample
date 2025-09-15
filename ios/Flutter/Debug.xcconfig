@@ -1,1 +1,3 @@
 #include "Generated.xcconfig"
+CODE_SIGN_IDENTITY = iPhone Developer
+PROVISIONING_PROFILE_SPECIFIER = match Development com.fourchoi.deploySample
